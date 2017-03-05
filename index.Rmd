@@ -1,5 +1,5 @@
 ---
-title: "index.Rmd"
+title: "IODS Course - Final Assignment"
 author: "Tiina Autio"
 date: "3/5/2017"
 output: html_document
