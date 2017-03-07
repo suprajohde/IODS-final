@@ -6,6 +6,8 @@ output: html_document
 ---
 
 
+Datasta täytyy tiputtaa pois lehdet (koska nyt vain kappaleittain osassa aineistoa) sekä yhdistellä kategorioita JÄN jä jne.
+
 
 ```{r}
 
