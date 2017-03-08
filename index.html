@@ -126,8 +126,68 @@ $(document).ready(function () {
 
 <div id="tiina.autiohelsinki.fi" class="section level6">
 <h6><a href="mailto:tiina.autio@helsinki.fi">tiina.autio@helsinki.fi</a></h6>
-<p>full name, date and email addres</p>
-<p>Datasta täytyy tiputtaa pois lehdet (koska nyt vain kappaleittain osassa aineistoa) sekä yhdistellä kategorioita JÄN jä jne.</p>
+</div>
+<div id="analysis-of-the-library-loan-data" class="section level1">
+<h1>Analysis of the library loan data</h1>
+<p>This data is combination of datasets from Pirkanmaa libraries most loaned 1000 pieces per year from years 2012-2015. To combine all data from all years magazines has been removed from data sets.</p>
+<p>Let’s take a look of the data:</p>
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: 'dplyr'</code></pre>
+<pre><code>## The following objects are masked from 'package:stats':
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>library_data &lt;- read.csv(&quot;~/Documents/IODS-final/Data/library_data.csv&quot;, sep=&quot;,&quot;, header=TRUE, stringsAsFactors = FALSE)
+colnames(library_data)</code></pre>
+<pre><code>## [1] &quot;X&quot;             &quot;Hyllypaikka&quot;   &quot;Tekijä&quot;        &quot;Nimeke&quot;       
+## [5] &quot;Lainojen.lkm.&quot; &quot;ISBN.ISSN&quot;     &quot;Julkaisuvuosi&quot; &quot;vuosi&quot;</code></pre>
+<pre class="r"><code>str(library_data)</code></pre>
+<pre><code>## 'data.frame':    3755 obs. of  8 variables:
+##  $ X            : int  2 3 4 5 6 7 8 9 10 11 ...
+##  $ Hyllypaikka  : chr  &quot;&quot; &quot; 03 F&quot; &quot; 03 F&quot; &quot; 03F&quot; ...
+##  $ Tekijä       : chr  &quot;Steel, Danielle.&quot; &quot;Harjanne, Maikki.&quot; &quot;Kallioniemi, Tuula.&quot; &quot;Tuomola, Johanna.&quot; ...
+##  $ Nimeke       : chr  &quot;Lurjus&quot; &quot;Minttu urheilee&quot; &quot;Karoliina ja nokkela Neema&quot; &quot;Minkä taakseen jättää : jännitysromaani&quot; ...
+##  $ Lainojen.lkm.: int  567 573 545 506 556 1875 1490 1611 855 1947 ...
+##  $ ISBN.ISSN    : chr  &quot;978-951-0-37778-9&quot; &quot;978-951-1-25427-0&quot; &quot;978-951-1-26984-7&quot; &quot;978-952-202-354-4&quot; ...
+##  $ Julkaisuvuosi: chr  &quot;2011&quot; &quot;2012-01-01&quot; &quot;2013-01-01&quot; &quot;2012-01-01&quot; ...
+##  $ vuosi        : int  2014 2012 2013 2012 2013 2013 2012 2013 2012 2012 ...</code></pre>
+<pre class="r"><code>glimpse(library_data)</code></pre>
+<pre><code>## Observations: 3,755
+## Variables: 8
+## $ X             &lt;int&gt; 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, ...
+## $ Hyllypaikka   &lt;chr&gt; &quot;&quot;, &quot; 03 F&quot;, &quot; 03 F&quot;, &quot; 03F&quot;, &quot; 05.1&quot;, &quot; 05.1&quot;, ...
+## $ Tekijä        &lt;chr&gt; &quot;Steel, Danielle.&quot;, &quot;Harjanne, Maikki.&quot;, &quot;Kallio...
+## $ Nimeke        &lt;chr&gt; &quot;Lurjus&quot;, &quot;Minttu urheilee&quot;, &quot;Karoliina ja nokke...
+## $ Lainojen.lkm. &lt;int&gt; 567, 573, 545, 506, 556, 1875, 1490, 1611, 855, ...
+## $ ISBN.ISSN     &lt;chr&gt; &quot;978-951-0-37778-9&quot;, &quot;978-951-1-25427-0&quot;, &quot;978-9...
+## $ Julkaisuvuosi &lt;chr&gt; &quot;2011&quot;, &quot;2012-01-01&quot;, &quot;2013-01-01&quot;, &quot;2012-01-01&quot;...
+## $ vuosi         &lt;int&gt; 2014, 2012, 2013, 2012, 2013, 2013, 2012, 2013, ...</code></pre>
+<p>Data set has seven variables:<br />
+- shelf location<br />
+- author<br />
+- name - quantity of the loans<br />
+- ISBN.ISSN id<br />
+- publishing year<br />
+- dataset year</p>
+<p>This is the summary of the data:</p>
+<pre class="r"><code>summary(library_data)</code></pre>
+<pre><code>##        X          Hyllypaikka           Tekijä             Nimeke         
+##  Min.   :   2.0   Length:3755        Length:3755        Length:3755       
+##  1st Qu.: 940.5   Class :character   Class :character   Class :character  
+##  Median :1880.0   Mode  :character   Mode  :character   Mode  :character  
+##  Mean   :1879.6                                                           
+##  3rd Qu.:2818.5                                                           
+##  Max.   :3757.0                                                           
+##  Lainojen.lkm.     ISBN.ISSN         Julkaisuvuosi          vuosi     
+##  Min.   : 425.0   Length:3755        Length:3755        Min.   :2012  
+##  1st Qu.: 514.0   Class :character   Class :character   1st Qu.:2013  
+##  Median : 611.0   Mode  :character   Mode  :character   Median :2014  
+##  Mean   : 741.5                                         Mean   :2014  
+##  3rd Qu.: 814.5                                         3rd Qu.:2015  
+##  Max.   :3845.0                                         Max.   :2015</code></pre>
 </div>
 
 

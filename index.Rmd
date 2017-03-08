@@ -6,9 +6,34 @@ output: html_document
 ---
 ###### tiina.autio@helsinki.fi
 
-Datasta täytyy tiputtaa pois lehdet (koska nyt vain kappaleittain osassa aineistoa) sekä yhdistellä kategorioita JÄN jä jne.
 
+# Analysis of the library loan data
 
+This data is combination of datasets from Pirkanmaa libraries most loaned 1000 pieces per year from years 2012-2015. To combine all data from all years magazines has been removed from data sets. Original data source (http://www.tampere.fi/tampereen-kaupunki/tietoa-tampereesta/avoin-data.html) and data wrangling file (https://github.com/suprajohde/IODS-final/blob/master/Data/Data%20Wrangling.R) have deeper description of the data.
+
+Let's take a look of the data:
 ```{r}
-
+library(dplyr)
+library_data <- read.csv("~/Documents/IODS-final/Data/library_data.csv", sep=",", header=TRUE, stringsAsFactors = FALSE)
+keep_columns <- c("Hyllypaikka", "Tekijä", "Nimeke", "Lainojen.lkm.", "ISBN.ISSN", "Julkaisuvuosi", "Vuosi")
+library_data <- select(library_data, one_of(keep_columns))
+colnames(library_data)
+str(library_data)
+glimpse(library_data)
 ```
+Data set has seven variables:  
+- shelf location  
+- author  
+- name
+- quantity of the loans  
+- ISBN.ISSN id  
+- publishing year  
+- dataset year  
+
+Dataset consists of 3755 different observations which means that 245 magazines has been removed from original data.
+
+This is the summary of the data:
+```{r}
+summary(library_data)
+```
+Summary of the data shows that there are maximum loan quantity has been 3845 and the lowest piece on the list has 425 loans. 

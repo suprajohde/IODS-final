@@ -71,6 +71,12 @@ year_2012
 year_2012$Hyllpaikka    <- unlist(temp)[2*(1:length(year_2012$Hyllpaikka))-1]
 year_2012$Hyllpaikka 
 
+## publishing year (removing months)
+temp <- strsplit(year_2012$Julkaisuvuosi,'-')
+year_2012$Julkaisuvuosi <- unlist(temp)[2*(1:length(year_2012$Julkaisuvuosi))-1]
+year_2012$Julkaisuvuosi
+
+
 ## Renaming all columns similar (2012 Hyllpaikka vs. Hyllypaikka in the other sets)
 colnames(year_2012)[colnames(year_2012)=="Hyllpaikka"] <- "Hyllypaikka"
 colnames(year_2012)
@@ -83,6 +89,9 @@ year_2013 <- filter(year_2013, magazine == FALSE)
 year_2013$Hyllpaikka    <- unlist(temp)[2*(1:length(year_2013$Hyllpaikka))-1]
 colnames(year_2013)[colnames(year_2013)=="Hyllpaikka"] <- "Hyllypaikka"
 colnames(year_2013)
+
+temp <- strsplit(year_2013$Julkaisuvuosi,'-')
+year_2013$Julkaisuvuosi <- unlist(temp)[2*(1:length(year_2013$Julkaisuvuosi))-1]
 
 # from datasets 2014 and 2015 we have to remove all magazines as well
 temp <- strsplit(year_2014$Hyllypaikka,',')
@@ -101,15 +110,16 @@ year_2013 <- select(year_2013, one_of(keep_columns))
 year_2014 <- select(year_2014, one_of(keep_columns))
 year_2015 <- select(year_2015, one_of(keep_columns))
 
-year_2012 <- mutate(year_2012, vuosi = "2012")
-year_2013 <- mutate(year_2013, vuosi = "2013")
-year_2014 <- mutate(year_2014, vuosi = "2014")
-year_2015 <- mutate(year_2015, vuosi = "2015")
+year_2012 <- mutate(year_2012, Vuosi = "2012")
+year_2013 <- mutate(year_2013, Vuosi = "2013")
+year_2014 <- mutate(year_2014, Vuosi = "2014")
+year_2015 <- mutate(year_2015, Vuosi = "2015")
 
-library_data_2012_2013 <- merge(year_2012, year_2013, all=TRUE)
-library_data_2014_2015 <- merge(year_2014, year_2015, all=TRUE)
-library_data <- merge(library_data_2012_2013, library_data_2014_2015, all=TRUE)
-
+library_data <- Reduce(function(x, y) merge(x, y, all=TRUE), 
+                 list(year_2012, year_2013, year_2014, year_2015))
+library_data <- library_data[complete.cases(library_data), ]
+keep_columns <- c("Hyllypaikka", "Tekijä", "Nimeke", "Lainojen.lkm.", "ISBN.ISSN", "Julkaisuvuosi", "Vuosi")
+library_data <- select(library_data, one_of(keep_columns))
 ## saving data set
 
 setwd("~/Documents/IODS-final/data")
