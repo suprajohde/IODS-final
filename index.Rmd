@@ -1,10 +1,10 @@
 ---
 title: "IODS Course - Final Assignment"
 author: "Tiina Autio"
-date: "3/5/2017"
+date: "08/03/2017"
 output: html_document
 ---
-
+###### tiina.autio@helsinki.fi
 
 Datasta täytyy tiputtaa pois lehdet (koska nyt vain kappaleittain osassa aineistoa) sekä yhdistellä kategorioita JÄN jä jne.
 
