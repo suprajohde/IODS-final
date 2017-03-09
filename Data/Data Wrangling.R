@@ -68,13 +68,15 @@ year_2012 <- filter(year_2012, magazine == FALSE)
 year_2012
 
 ## only one self location per row (taking the first one mentioned)
-year_2012$Hyllpaikka    <- unlist(temp)[2*(1:length(year_2012$Hyllpaikka))-1]
-year_2012$Hyllpaikka 
+library(reshape2)
+temp2 <- colsplit(string=year_2012$Hyllpaikka, pattern=",", names=c("Part1", "Part2"))
+year_2012$Hyllpaikka <- temp2$Part1
+year_2012$Hyllpaikka
+
 
 ## publishing year (removing months)
-temp <- strsplit(year_2012$Julkaisuvuosi,'-')
-year_2012$Julkaisuvuosi <- unlist(temp)[2*(1:length(year_2012$Julkaisuvuosi))-1]
-year_2012$Julkaisuvuosi
+temp2 <- colsplit(string=year_2012$Julkaisuvuosi, pattern="-", names=c("Part1", "Part2"))
+year_2012$Julkaisuvuosi <- temp2$Part1
 
 
 ## Renaming all columns similar (2012 Hyllpaikka vs. Hyllypaikka in the other sets)
@@ -86,12 +88,13 @@ colnames(year_2012)
 temp <- strsplit(year_2013$Hyllpaikka,',')
 year_2013 <- mutate(year_2013, magazine = grepl(to_be_deleted_magazines,temp) )
 year_2013 <- filter(year_2013, magazine == FALSE)
-year_2013$Hyllpaikka    <- unlist(temp)[2*(1:length(year_2013$Hyllpaikka))-1]
+temp2 <- colsplit(string=year_2013$Hyllpaikka, pattern=",", names=c("Part1", "Part2"))
+year_2013$Hyllpaikka <- temp2$Part1
 colnames(year_2013)[colnames(year_2013)=="Hyllpaikka"] <- "Hyllypaikka"
 colnames(year_2013)
 
-temp <- strsplit(year_2013$Julkaisuvuosi,'-')
-year_2013$Julkaisuvuosi <- unlist(temp)[2*(1:length(year_2013$Julkaisuvuosi))-1]
+temp2 <- colsplit(string=year_2013$Julkaisuvuosi, pattern="-", names=c("Part1", "Part2"))
+year_2013$Julkaisuvuosi <- temp2$Part1
 
 # from datasets 2014 and 2015 we have to remove all magazines as well
 temp <- strsplit(year_2014$Hyllypaikka,',')
@@ -115,11 +118,20 @@ year_2013 <- mutate(year_2013, Vuosi = "2013")
 year_2014 <- mutate(year_2014, Vuosi = "2014")
 year_2015 <- mutate(year_2015, Vuosi = "2015")
 
+year_2012$Julkaisuvuosi <- as.numeric(as.character(year_2012$Julkaisuvuosi))
+year_2013$Julkaisuvuosi <- as.numeric(as.character(year_2013$Julkaisuvuosi))
+year_2014$Julkaisuvuosi <- as.numeric(as.character(year_2014$Julkaisuvuosi))
+year_2015$Julkaisuvuosi <- as.numeric(as.character(year_2015$Julkaisuvuosi))
+
 library_data <- Reduce(function(x, y) merge(x, y, all=TRUE), 
                  list(year_2012, year_2013, year_2014, year_2015))
 library_data <- library_data[complete.cases(library_data), ]
 keep_columns <- c("Hyllypaikka", "Tekijä", "Nimeke", "Lainojen.lkm.", "ISBN.ISSN", "Julkaisuvuosi", "Vuosi")
 library_data <- select(library_data, one_of(keep_columns))
+
+## sorting
+library_data[order("Lainojen.lkm.", "Vuosi", "Julkaisuvuosi"),]
+
 ## saving data set
 
 setwd("~/Documents/IODS-final/data")

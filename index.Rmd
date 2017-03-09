@@ -11,6 +11,8 @@ output: html_document
 
 This data is combination of datasets from Pirkanmaa libraries most loaned 1000 pieces per year from years 2012-2015. To combine all data from all years magazines has been removed from data sets. Original data source (http://www.tampere.fi/tampereen-kaupunki/tietoa-tampereesta/avoin-data.html) and data wrangling file (https://github.com/suprajohde/IODS-final/blob/master/Data/Data%20Wrangling.R) have deeper description of the data.
 
+I wanted to look what are most loaned pieces of the Pirkanmaa librarys per years and how do they vary from year to year. My assumption is that most loaned pieces vary from year to year because each year so many books are being published.
+
 Let's take a look of the data:
 ```{r}
 library(dplyr)
@@ -36,4 +38,98 @@ This is the summary of the data:
 ```{r}
 summary(library_data)
 ```
-Summary of the data shows that there are maximum loan quantity has been 3845 and the lowest piece on the list has 425 loans. 
+Summary of the data shows that there are maximum loan quantity has been 3845 and the lowest loans amount of the data set is 425. Oldest piece is from 1974 and the newest is from year 2015. Median for publishing year is 2011 so all pieces are kind of new.
+
+Most loaned pieces from year 2012:  
+```{r}
+top_data <- filter(library_data, Vuosi == 2012)
+
+keep_columns <- c("Tekijä", "Nimeke", "Lainojen.lkm.", "Julkaisuvuosi")
+top_data <- select(top_data, one_of(keep_columns))
+
+## ordering by loan amount
+top_data <- top_data[with(top_data,order(-top_data$Lainojen.lkm.)),]
+
+## only top20
+top_data <- top_data[1:20, ]
+
+top_data
+```
+Most of 2012 books are written by same authors. Books of Risto Räppääjä seems to be really interesting for loaners. Reason for this might be that these are children's books so maybe adults are more interested ro loan these instead of buying.  
+
+Most loaned pieces from year 2013:  
+```{r}
+top_data <- filter(library_data, Vuosi == 2013)
+
+keep_columns <- c("Tekijä", "Nimeke", "Lainojen.lkm.", "Julkaisuvuosi")
+top_data <- select(top_data, one_of(keep_columns))
+
+## ordering by loan amount
+top_data <- top_data[with(top_data,order(-top_data$Lainojen.lkm.)),]
+
+## only top20
+top_data <- top_data[1:20, ]
+
+top_data
+```
+Year 2013 Vihan sukua was the most popular book (3415 loans). Most of the list still consists of children's books.  
+
+
+Most loaned pieces from year 2014:  
+```{r}
+top_data <- filter(library_data, Vuosi == 2014)
+
+keep_columns <- c("Tekijä", "Nimeke", "Lainojen.lkm.", "Julkaisuvuosi")
+top_data <- select(top_data, one_of(keep_columns))
+
+## ordering by loan amount
+top_data <- top_data[with(top_data,order(-top_data$Lainojen.lkm.)),]
+
+## only top20
+top_data <- top_data[1:20, ]
+
+top_data
+```
+
+Seppo Jokinen is still the most popular author and now he even has another book on top 20.
+
+Most loaned pieces from year 2015:  
+```{r}
+top_data <- filter(library_data, Vuosi == 2015)
+
+keep_columns <- c("Tekijä", "Nimeke", "Lainojen.lkm.", "Julkaisuvuosi")
+top_data <- select(top_data, one_of(keep_columns))
+
+## ordering by loan amount
+top_data <- top_data[with(top_data,order(-top_data$Lainojen.lkm.)),]
+
+## only top20
+top_data <- top_data[1:20, ]
+
+top_data
+```
+Seppo Jokinen still leads the top 20 list thirds year in a row.
+
+From all years, these have been the most loaned books:
+```{r}
+library_data %>% group_by(Nimeke, Tekijä, Julkaisuvuosi, ISBN.ISSN) %>% summarize(sum=n()) -> sums
+sums <- sums[with(sums,order(-sums$sum)),]
+
+sums[1:20, ]
+```
+For this list I try to summarize all individual books into same loan amout column (sum). If all years are taken into care of then the top 20 list has also books for adults. Top 20 also has children books as well but not so many as individual years. Maybe now book in the top of the list are more like classics?
+
+Loans by publishing year:
+```{r}
+library(ggplot2)
+qplot(Julkaisuvuosi, sum, data = sums) + geom_smooth(method = "lm") +ggtitle("Publishing years versus loans")
+
+my_model2 <- lm(sum ~ Julkaisuvuosi, data = sums)
+par(mfrow = c(2,2))
+plot(my_model2, c(1, 2, 5))
+```
+Plot of shows publishing year versus loan amount regression analysis. Other plots are for regression model diagnostics. Seems that based on regression model older "books" classics are more interesting to library users than newer books.
+
+Final words. It has been nice to learn R and it seems to be powerful tool for data analysis especially with Markdown syntax. Still a lot more needs to be learn until I'll remember all handy librarys and funtions. I also noticed that my data set wasn't very good for this kind of analysis (only calculation was number of loans).
+
+Data wrangling took a lot of time (because I have to learn how to split columns etc.). At first I thought that just combining library data from four years should be pretty easy but later I noticed that there are some challenges as well. Because loan counting for individual magazine numbers have been started from 2014, first two years had too high loan amount per magazine. Thus I had to remove them from the data sets. One challenge also was that R has many ways to end up to same result so sometimes it was hard to know which function to pick.
